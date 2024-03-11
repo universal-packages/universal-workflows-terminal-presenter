@@ -15,7 +15,7 @@
     "format": "prettier --write \"./{src,tests}/**/*.{ts,tsx,js,jsx,json}\"",
     "update-dependents": "umaintenance update-dependents"
   },
-  "perDependencies": {
+  "dependencies": {
     "@universal-packages/terminal-presenter": "^1.3.2",
     "@universal-packages/workflows": "^1.3.1"
   },

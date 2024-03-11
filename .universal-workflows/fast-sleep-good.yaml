@@ -1,5 +1,9 @@
 name: Sleep good
 
+maxConcurrentRoutines: 2
+
+target: spawn
+
 routines:
   sleep-simple:
     steps:
