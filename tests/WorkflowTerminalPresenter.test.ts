@@ -29,6 +29,10 @@ describe(WorkflowTerminalPresenter, (): void => {
 
     workflowTerminalPresenter.present()
 
+    workflow.on('**', () => {
+      jest.advanceTimersToNextTimer()
+    })
+
     await workflow.run()
 
     jest.advanceTimersToNextTimer()
