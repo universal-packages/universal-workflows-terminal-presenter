@@ -698,8 +698,7 @@ export default class WorkflowTerminalPresenter {
                 lastOutputRowBlocks.push({
                   color: currentStep.status === Status.Failure ? RedColor.DarkRed : undefined,
                   height: 1,
-                  text: this.stepsLastOutputs[currentRoutineBlockMapItem.routineGraph.name][k],
-                  width: 'fit'
+                  text: this.stepsLastOutputs[currentRoutineBlockMapItem.routineGraph.name][k]
                 })
                 rowDescriptors.push({ blocks: lastOutputRowBlocks })
               }
