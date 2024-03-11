@@ -1,0 +1,41 @@
+name: Sleep good
+
+maxConcurrentRoutines: 2
+
+routines:
+  sleep-simple:
+    steps:
+      - run: echo "Sleeping for 5 seconds"
+      - run: echo "Temporal" && sleep 5
+  sleep-strategy:
+    onFailure: continue
+    strategy:
+      matrix:
+        term1: [1, 2, 3]
+        term2: [1, 2, 3, a]
+      onFailure: continue
+    steps:
+      - run: echo "Sleeping for ${{ strategy.term1 * strategy.term2 }} seconds"
+      - run: echo "Temporal" && sleep ${{ (strategy.term1 * strategy.term2) || 'nop'  }}
+
+  level2-sleep:
+    dependsOn:
+      - sleep-strategy
+      - sleep-simple
+    steps:
+      - run: echo "Sleeping for 3 seconds"
+      - run: echo "Temporal" && sleep 3
+
+  level2-2-sleep:
+    dependsOn: sleep-simple
+    steps:
+      - run: echo "Sleeping for 3 seconds"
+      - run: echo "Temporal" && sleep 3
+
+  level3-sleep:
+    dependsOn:
+      - level2-sleep
+      - level2-2-sleep
+    steps:
+      - run: echo "Sleeping for 3 seconds"
+      - run: echo "Temporal" && sleep 3

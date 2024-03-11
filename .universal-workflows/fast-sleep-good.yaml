@@ -1,0 +1,39 @@
+name: Sleep good
+
+routines:
+  sleep-simple:
+    steps:
+      - run: echo "Sleeping for 0.1 seconds"
+      - run: echo "Temporal" && sleep 0.1
+  sleep-strategy:
+    onFailure: continue
+    strategy:
+      matrix:
+        term1: [0.1, 0.2]
+        term2: [0.1, a]
+      onFailure: continue
+    steps:
+      - run: echo "Sleeping for ${{ strategy.term1 * strategy.term2 }} seconds"
+      - run: echo "Temporal" && sleep ${{ (strategy.term1 * strategy.term2) || 'nop'  }}
+
+  level2-sleep:
+    dependsOn:
+      - sleep-strategy
+      - sleep-simple
+    steps:
+      - run: echo "Sleeping for 0.1 seconds"
+      - run: echo "Temporal" && sleep 0.1
+
+  level2-2-sleep:
+    dependsOn: sleep-simple
+    steps:
+      - run: echo "Sleeping for 0.1 seconds"
+      - run: echo "Temporal" && sleep 0.1
+
+  level3-sleep:
+    dependsOn:
+      - level2-sleep
+      - level2-2-sleep
+    steps:
+      - run: echo "Sleeping for 0.1 seconds"
+      - run: echo "Temporal" && sleep 0.1
