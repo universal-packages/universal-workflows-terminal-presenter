@@ -8,9 +8,6 @@ import { RoutineBlockMapItem, WorkflowTerminalPresenterOptions } from './types'
 export default class WorkflowTerminalPresenter {
   public readonly options: WorkflowTerminalPresenterOptions
 
-  private readonly terminalPresenter: TerminalPresenter
-  private myTerminalPresenter: boolean = false
-
   private workflow: Workflow
   private hooked = false
 
@@ -23,13 +20,6 @@ export default class WorkflowTerminalPresenter {
       showRoutineSteps: 'running',
       showStrategyRoutines: 'strategy-active',
       ...options
-    }
-
-    this.terminalPresenter = this.options.terminalPresenter
-
-    if (!this.terminalPresenter) {
-      this.terminalPresenter = new TerminalPresenter()
-      this.myTerminalPresenter = true
     }
 
     this.workflow = this.options.workflow
@@ -387,13 +377,10 @@ export default class WorkflowTerminalPresenter {
       setTimeout(() => {
         TerminalPresenter.removeDocument('workflow')
         this.workflow.removeAllListeners()
-        if (this.myTerminalPresenter) TerminalPresenter.stop()
       }, 1000)
     })
 
     TerminalPresenter.appendDocument('workflow', this.generateWorkflowDocument(this.workflow.graph))
-
-    if (this.myTerminalPresenter) TerminalPresenter.start()
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {

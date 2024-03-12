@@ -1,3 +1,4 @@
+import { TerminalPresenter } from '@universal-packages/terminal-presenter'
 import { writeStdout } from '@universal-packages/terminal-presenter/writeStdout'
 import { Workflow } from '@universal-packages/workflows'
 
@@ -18,9 +19,16 @@ jest.mock('ansi-escapes', () => ({
 
 process.stdout.columns = 80
 
+afterEach((): void => {
+  TerminalPresenter.stop()
+  jest.clearAllMocks()
+})
+
 describe(WorkflowTerminalPresenter, (): void => {
   it('throws if use not implemented', async (): Promise<void> => {
     const writeStdoutMock = writeStdout as jest.Mock
+
+    TerminalPresenter.start()
 
     const workflow = Workflow.buildFrom('fast-sleep-good')
     const workflowTerminalPresenter = new WorkflowTerminalPresenter({ workflow })
