@@ -1,6 +1,5 @@
 import { writeStdout } from '@universal-packages/terminal-presenter/writeStdout'
 import { Workflow } from '@universal-packages/workflows'
-import stripAnsi from 'strip-ansi'
 
 import { WorkflowTerminalPresenter } from '../src'
 
@@ -21,7 +20,6 @@ process.stdout.columns = 80
 
 describe(WorkflowTerminalPresenter, (): void => {
   it('throws if use not implemented', async (): Promise<void> => {
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
     const writeStdoutMock = writeStdout as jest.Mock
 
     const workflow = Workflow.buildFrom('fast-sleep-good')
@@ -37,7 +35,6 @@ describe(WorkflowTerminalPresenter, (): void => {
 
     jest.advanceTimersToNextTimer()
 
-    expect(logSpy).toHaveBeenCalledTimes(52)
     expect(writeStdoutMock).toHaveBeenCalled()
   })
 })

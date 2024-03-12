@@ -380,20 +380,20 @@ export default class WorkflowTerminalPresenter {
         this.stepsLastOutputs[event.payload.routine][event.payload.index] = event.payload.data
       }
 
-      this.terminalPresenter.updateDocument('workflow', this.generateWorkflowDocument(graph))
+      TerminalPresenter.updateDocument('workflow', this.generateWorkflowDocument(graph))
     })
 
     this.workflow.on('end', () => {
       setTimeout(() => {
-        this.terminalPresenter.removeDocument('workflow')
+        TerminalPresenter.removeDocument('workflow')
         this.workflow.removeAllListeners()
-        if (this.myTerminalPresenter) this.terminalPresenter.stop()
+        if (this.myTerminalPresenter) TerminalPresenter.stop()
       }, 1000)
     })
 
-    this.terminalPresenter.appendDocument('workflow', this.generateWorkflowDocument(this.workflow.graph))
+    TerminalPresenter.appendDocument('workflow', this.generateWorkflowDocument(this.workflow.graph))
 
-    if (this.myTerminalPresenter) this.terminalPresenter.start()
+    if (this.myTerminalPresenter) TerminalPresenter.start()
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {
@@ -744,6 +744,6 @@ export default class WorkflowTerminalPresenter {
   private logDocument(documentDescriptor: DocumentDescriptor): void {
     const document = new TerminalDocument()
     document.describe(documentDescriptor)
-    this.terminalPresenter.log(document.result)
+    TerminalPresenter.print(document.result + '\n')
   }
 }
