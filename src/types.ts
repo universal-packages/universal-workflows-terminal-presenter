@@ -3,6 +3,7 @@ import { RoutineGraph, StrategyGraph, Workflow } from '@universal-packages/workf
 
 export interface WorkflowTerminalPresenterOptions {
   logEvents?: boolean
+  logSize?: 'essentials' | 'full'
   showRoutines?: 'always' | 'pending' | 'running'
   showRoutineSteps?: 'always' | 'routine-active' | 'pending' | 'running'
   showStrategyRoutines?: 'always' | 'strategy-active' | 'pending' | 'running'

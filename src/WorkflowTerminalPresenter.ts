@@ -16,6 +16,7 @@ export default class WorkflowTerminalPresenter {
   public constructor(options: WorkflowTerminalPresenterOptions) {
     this.options = {
       logEvents: true,
+      logSize: 'essentials',
       showRoutines: 'always',
       showRoutineSteps: 'running',
       showStrategyRoutines: 'strategy-active',
@@ -31,334 +32,364 @@ export default class WorkflowTerminalPresenter {
 
     if (this.options.logEvents) {
       this.workflow.on('running', () => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: BlueColor.SteelBlue,
-                  color: WhiteColor.AliceBlue,
-                  style: 'bold',
-                  text: ' WORKFLOW ',
-                  width: 'fit'
-                },
-                { text: ` ${this.workflow.name || ''}`, width: 'fit' },
-                { style: 'bold', text: ' Running ', width: 'fit' },
-                { text: this.formatTime(this.workflow.startedAt), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: BlueColor.SteelBlue,
+                    color: WhiteColor.AliceBlue,
+                    style: 'bold',
+                    text: ' WORKFLOW ',
+                    width: 'fit'
+                  },
+                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { style: 'bold', text: ' Running ', width: 'fit' },
+                  { text: this.formatTime(this.workflow.startedAt), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('success', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: GreenColor.Green,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' WORKFLOW ',
-                  width: 'fit'
-                },
-                { text: ` ${this.workflow.name || ''}`, width: 'fit' },
-                { style: 'bold', text: ' Success ', width: 'fit' },
-                { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: GreenColor.Green,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' WORKFLOW ',
+                    width: 'fit'
+                  },
+                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { style: 'bold', text: ' Success ', width: 'fit' },
+                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('failure', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkRed,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' WORKFLOW ',
-                  width: 'fit'
-                },
-                { text: ` ${this.workflow.name || ''}`, width: 'fit' },
-                { style: 'bold', text: ' Failure ', width: 'fit' },
-                { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' WORKFLOW ',
+                    width: 'fit'
+                  },
+                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { style: 'bold', text: ' Failure ', width: 'fit' },
+                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('stopping', () => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkSalmon,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' WORKFLOW ',
-                  width: 'fit'
-                },
-                { text: ` ${this.workflow.name || ''}`, width: 'fit' },
-                { style: 'bold', text: ' Stopping ', width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' ) {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkSalmon,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' WORKFLOW ',
+                    width: 'fit'
+                  },
+                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { style: 'bold', text: ' Stopping ', width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('stopped', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkRed,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' WORKFLOW ',
-                  width: 'fit'
-                },
-                { text: ` ${this.workflow.name || ''}`, width: 'fit' },
-                { style: 'bold', text: ' Stopped ', width: 'fit' },
-                { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' WORKFLOW ',
+                    width: 'fit'
+                  },
+                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { style: 'bold', text: ' Stopped ', width: 'fit' },
+                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
 
       this.workflow.on('routine:running', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: BrownColor.DarkGoldenrod,
-                  color: WhiteColor.AliceBlue,
-                  style: 'bold',
-                  text: ' ROUTINE  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.name}`, width: 'fit' },
-                { style: 'bold', text: ' Running ', width: 'fit' },
-                { text: this.formatTime(event.payload.startedAt), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: BrownColor.DarkGoldenrod,
+                    color: WhiteColor.AliceBlue,
+                    style: 'bold',
+                    text: ' ROUTINE  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { style: 'bold', text: ' Running ', width: 'fit' },
+                  { text: this.formatTime(event.payload.startedAt), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('routine:success', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: GreenColor.Green,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' ROUTINE  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.name}`, width: 'fit' },
-                { style: 'bold', text: ' Success ', width: 'fit' },
-                { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.payload.graph.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: GreenColor.Green,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' ROUTINE  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { style: 'bold', text: ' Success ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('routine:failure', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkRed,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' ROUTINE  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.name}`, width: 'fit' },
-                { style: 'bold', text: ' Failure ', width: 'fit' },
-                { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.payload.graph.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' ROUTINE  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { style: 'bold', text: ' Failure ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('routine:stopping', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkSalmon,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' ROUTINE  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.name}`, width: 'fit' },
-                { style: 'bold', text: ' Stopping ', width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' ) {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkSalmon,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' ROUTINE  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { style: 'bold', text: ' Stopping ', width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('routine:stopped', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkRed,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' ROUTINE  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.name}`, width: 'fit' },
-                { style: 'bold', text: ' Stopped ', width: 'fit' },
-                { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.payload.graph.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' ROUTINE  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { style: 'bold', text: ' Stopped ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
 
       this.workflow.on('step:running', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: BrownColor.DarkGoldenrod,
-                  color: WhiteColor.AliceBlue,
-                  style: 'bold',
-                  text: ' STEP  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index + 1}`, width: 'fit' },
-                { style: 'bold', text: ' Running ', width: 'fit' },
-                { text: this.formatTime(event.payload.startedAt), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: BrownColor.DarkGoldenrod,
+                    color: WhiteColor.AliceBlue,
+                    style: 'bold',
+                    text: ' STEP  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index + 1}`, width: 'fit' },
+                  { style: 'bold', text: ' Running ', width: 'fit' },
+                  { text: this.formatTime(event.payload.startedAt), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('step:success', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: GreenColor.Green,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' STEP  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
-                { style: 'bold', text: ' Success ', width: 'fit' },
-                { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.payload.graph.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: GreenColor.Green,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' STEP  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { style: 'bold', text: ' Success ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('step:failure', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkRed,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' STEP  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
-                { style: 'bold', text: ' Failure ', width: 'fit' },
-                { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.payload.graph.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                { text: '  ', width: 'fit' },
-                {
-                  color: RedColor.DarkRed,
-                  text: event.payload.graph.output
-                }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' STEP  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { style: 'bold', text: ' Failure ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  { text: '  ', width: 'fit' },
+                  {
+                    color: RedColor.DarkRed,
+                    text: event.payload.graph.output
+                  }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('step:stopping', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkSalmon,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' STEP  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
-                { style: 'bold', text: ' Stopping ', width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkSalmon,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' STEP  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { style: 'bold', text: ' Stopping ', width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
       this.workflow.on('step:stopped', (event) => {
-        this.logDocument({
-          rows: [
-            {
-              blocks: [
-                {
-                  backgroundColor: RedColor.DarkRed,
-                  color: WhiteColor.White,
-                  style: 'bold',
-                  text: ' STEP  ',
-                  width: 'fit'
-                },
-                { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
-                { style: 'bold', text: ' Stopped ', width: 'fit' },
-                { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                { text: ' ', width: 'fit' },
-                { text: event.payload.graph.measurement.toString(), width: 'fit' }
-              ]
-            }
-          ]
-        })
+        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' STEP  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { style: 'bold', text: ' Stopped ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              }
+            ]
+          })
+        }
       })
     }
 
