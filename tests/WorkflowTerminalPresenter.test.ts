@@ -31,7 +31,7 @@ describe(WorkflowTerminalPresenter, (): void => {
     TerminalPresenter.configure({ test: false })
     TerminalPresenter.start()
 
-    const workflow = Workflow.buildFrom('fast-sleep-good')
+    const workflow = Workflow.buildFrom('fast-sleep-good', { allowDescribedTargetsOnTest: true })
     const workflowTerminalPresenter = new WorkflowTerminalPresenter({ workflow })
 
     workflowTerminalPresenter.present()
