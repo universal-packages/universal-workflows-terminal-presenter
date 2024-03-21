@@ -28,7 +28,7 @@ describe(WorkflowTerminalPresenter, (): void => {
   it('throws if use not implemented', async (): Promise<void> => {
     const writeStdoutMock = writeStdout as jest.Mock
 
-    TerminalPresenter.configure({ printRealTIme: true })
+    TerminalPresenter.configure({ enabled: true })
     TerminalPresenter.start()
 
     const workflow = Workflow.buildFrom('fast-sleep-good', { allowDescribedTargetsOnTest: true })
