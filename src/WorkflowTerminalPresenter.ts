@@ -117,8 +117,7 @@ export default class WorkflowTerminalPresenter {
                   { text: ` ${this.workflow.name || ''}`, width: 'fit' },
                   { style: 'bold', text: ' Error ', width: 'fit' },
                   { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.measurement.toString(), width: 'fit' }
+                  { text: ' ', width: 'fit' }
                 ]
               },
               {
@@ -266,8 +265,7 @@ export default class WorkflowTerminalPresenter {
                   { text: ` ${event.payload.name}`, width: 'fit' },
                   { style: 'bold', text: ' Error ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                  { text: ' ', width: 'fit' }
                 ]
               },
 
@@ -425,8 +423,7 @@ export default class WorkflowTerminalPresenter {
                   { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
                   { style: 'bold', text: ' Error ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                  { text: ' ', width: 'fit' }
                 ]
               },
               {
