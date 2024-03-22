@@ -32,7 +32,7 @@ export default class WorkflowTerminalPresenter {
 
     if (this.options.logEvents) {
       this.workflow.on('running', () => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -54,7 +54,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('success', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -78,7 +78,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('failure', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -101,8 +101,41 @@ export default class WorkflowTerminalPresenter {
           })
         }
       })
+      this.workflow.on('error', (event) => {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' WORKFLOW ',
+                    width: 'fit'
+                  },
+                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { style: 'bold', text: ' Error ', width: 'fit' },
+                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.measurement.toString(), width: 'fit' }
+                ]
+              },
+              {
+                blocks: [
+                  { text: '  ', width: 'fit' },
+                  {
+                    color: RedColor.DarkRed,
+                    text: event.error.message
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      })
       this.workflow.on('stopping', () => {
-        if (this.options.logSize === 'full' ) {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -123,7 +156,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('stopped', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -148,7 +181,7 @@ export default class WorkflowTerminalPresenter {
       })
 
       this.workflow.on('routine:running', (event) => {
-        if (this.options.logSize === 'full') {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -170,7 +203,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('routine:success', (event) => {
-        if (this.options.logSize === 'full') {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -194,7 +227,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('routine:failure', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -217,8 +250,42 @@ export default class WorkflowTerminalPresenter {
           })
         }
       })
+      this.workflow.on('routine:error', (event) => {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' ROUTINE  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { style: 'bold', text: ' Error ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              },
+
+              {
+                blocks: [
+                  { text: '  ', width: 'fit' },
+                  {
+                    color: RedColor.DarkRed,
+                    text: event.error.message
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      })
       this.workflow.on('routine:stopping', (event) => {
-        if (this.options.logSize === 'full' ) {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -239,7 +306,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('routine:stopped', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -264,7 +331,7 @@ export default class WorkflowTerminalPresenter {
       })
 
       this.workflow.on('step:running', (event) => {
-        if (this.options.logSize === 'full') {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -276,7 +343,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index + 1}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
                   { style: 'bold', text: ' Running ', width: 'fit' },
                   { text: this.formatTime(event.payload.startedAt), width: 'fit' }
                 ]
@@ -286,7 +353,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('step:success', (event) => {
-        if (this.options.logSize === 'full') {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -310,7 +377,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('step:failure', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -328,11 +395,7 @@ export default class WorkflowTerminalPresenter {
                   { text: ' ', width: 'fit' },
                   { text: event.payload.graph.measurement.toString(), width: 'fit' }
                 ]
-              }
-            ]
-          })
-          this.logDocument({
-            rows: [
+              },
               {
                 blocks: [
                   { text: '  ', width: 'fit' },
@@ -346,8 +409,41 @@ export default class WorkflowTerminalPresenter {
           })
         }
       })
+      this.workflow.on('step:error', (event) => {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
+          this.logDocument({
+            rows: [
+              {
+                blocks: [
+                  {
+                    backgroundColor: RedColor.DarkRed,
+                    color: WhiteColor.White,
+                    style: 'bold',
+                    text: ' STEP  ',
+                    width: 'fit'
+                  },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { style: 'bold', text: ' Error ', width: 'fit' },
+                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
+                  { text: ' ', width: 'fit' },
+                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
+                ]
+              },
+              {
+                blocks: [
+                  { text: '  ', width: 'fit' },
+                  {
+                    color: RedColor.DarkRed,
+                    text: event.error.message
+                  }
+                ]
+              }
+            ]
+          })
+        }
+      })
       this.workflow.on('step:stopping', (event) => {
-        if (this.options.logSize === 'full') {
+        if (['full'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
@@ -368,7 +464,7 @@ export default class WorkflowTerminalPresenter {
         }
       })
       this.workflow.on('step:stopped', (event) => {
-        if (this.options.logSize === 'full' || this.options.logSize === 'essentials') {
+        if (['full', 'essentials'].includes(this.options.logSize)) {
           this.logDocument({
             rows: [
               {
