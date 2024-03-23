@@ -16,8 +16,8 @@
     "update-universal-dependencies": "umaintenance update-universal-dependencies"
   },
   "dependencies": {
-    "@universal-packages/terminal-presenter": "^1.7.3",
-    "@universal-packages/workflows": "^1.8.6"
+    "@universal-packages/terminal-presenter": "^1.7.4",
+    "@universal-packages/workflows": "^1.8.7"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
