@@ -125,7 +125,7 @@ export default class WorkflowTerminalPresenter {
                   { text: '  ', width: 'fit' },
                   {
                     color: RedColor.DarkRed,
-                    text: event.error.message
+                    text: event.error.toString()
                   }
                 ]
               }
@@ -274,7 +274,7 @@ export default class WorkflowTerminalPresenter {
                   { text: '  ', width: 'fit' },
                   {
                     color: RedColor.DarkRed,
-                    text: event.error.message
+                    text: event.error.toString()
                   }
                 ]
               }
@@ -431,7 +431,7 @@ export default class WorkflowTerminalPresenter {
                   { text: '  ', width: 'fit' },
                   {
                     color: RedColor.DarkRed,
-                    text: event.error.message
+                    text: event.error.toString()
                   }
                 ]
               }
