@@ -6,7 +6,7 @@ import { WorkflowTerminalPresenter } from './src'
 async function doIt() {
   TerminalPresenter.start()
 
-  const workflow = Workflow.buildFrom('fast-sleep-good')
+  const workflow = Workflow.buildFrom('sleep-good')
   const workflowTerminalPresenter = new WorkflowTerminalPresenter({
     workflow
   })

@@ -33,7 +33,7 @@ export default class WorkflowTerminalPresenter {
     if (this.options.logEvents) {
       this.workflow.on('running', () => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -55,7 +55,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('success', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -79,7 +79,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('failure', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -103,7 +103,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('error', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -135,7 +135,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('stopping', () => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -156,7 +156,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('stopped', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -181,7 +181,7 @@ export default class WorkflowTerminalPresenter {
 
       this.workflow.on('routine:running', (event) => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -203,7 +203,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('routine:success', (event) => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -227,7 +227,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('routine:failure', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -251,7 +251,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('routine:error', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -284,7 +284,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('routine:stopping', (event) => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -305,7 +305,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('routine:stopped', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -330,7 +330,7 @@ export default class WorkflowTerminalPresenter {
 
       this.workflow.on('step:running', (event) => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -341,7 +341,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
                   { style: 'bold', text: ' Running ', width: 'fit' },
                   { text: this.formatTime(event.payload.startedAt), width: 'fit' }
                 ]
@@ -352,7 +352,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('step:success', (event) => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -363,7 +363,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
                   { style: 'bold', text: ' Success ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -376,7 +376,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('step:failure', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -387,7 +387,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
                   { style: 'bold', text: ' Failure ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -409,7 +409,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('step:error', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -420,7 +420,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
                   { style: 'bold', text: ' Error ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' }
@@ -441,7 +441,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('step:stopping', (event) => {
         if (['full'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -452,7 +452,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
                   { style: 'bold', text: ' Stopping ', width: 'fit' }
                 ]
               }
@@ -462,7 +462,7 @@ export default class WorkflowTerminalPresenter {
       })
       this.workflow.on('step:stopped', (event) => {
         if (['full', 'essentials'].includes(this.options.logSize)) {
-          this.logDocument({
+          TerminalPresenter.printDocument({
             rows: [
               {
                 blocks: [
@@ -473,7 +473,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' STEP  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, width: 'fit' },
+                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
                   { style: 'bold', text: ' Stopped ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -850,11 +850,5 @@ export default class WorkflowTerminalPresenter {
     const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds.toString()
 
     return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
-  }
-
-  private logDocument(documentDescriptor: DocumentDescriptor): void {
-    const document = new TerminalDocument()
-    document.describe(documentDescriptor)
-    TerminalPresenter.print(document.result + '\n')
   }
 }
