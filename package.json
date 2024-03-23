@@ -16,7 +16,7 @@
     "update-universal-dependencies": "umaintenance update-universal-dependencies"
   },
   "dependencies": {
-    "@universal-packages/terminal-presenter": "^1.8.0",
+    "@universal-packages/terminal-presenter": "^1.8.1",
     "@universal-packages/workflows": "^1.8.9"
   },
   "devDependencies": {
