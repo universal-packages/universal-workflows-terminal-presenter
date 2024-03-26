@@ -44,7 +44,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' WORKFLOW ',
                     width: 'fit'
                   },
-                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { text: ` ${this.workflow.name || ''}`, height: 1 },
                   { style: 'bold', text: ' Running ', width: 'fit' },
                   { text: this.formatTime(this.workflow.startedAt), width: 'fit' }
                 ]
@@ -66,7 +66,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' WORKFLOW ',
                     width: 'fit'
                   },
-                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { text: ` ${this.workflow.name || ''}`, height: 1 },
                   { style: 'bold', text: ' Success ', width: 'fit' },
                   { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -90,7 +90,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' WORKFLOW ',
                     width: 'fit'
                   },
-                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { text: ` ${this.workflow.name || ''}`, height: 1 },
                   { style: 'bold', text: ' Failure ', width: 'fit' },
                   { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -114,7 +114,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' WORKFLOW ',
                     width: 'fit'
                   },
-                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { text: ` ${this.workflow.name || ''}`, height: 1 },
                   { style: 'bold', text: ' Error ', width: 'fit' },
                   { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' }
@@ -146,7 +146,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' WORKFLOW ',
                     width: 'fit'
                   },
-                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { text: ` ${this.workflow.name || ''}`, height: 1 },
                   { style: 'bold', text: ' Stopping ', width: 'fit' }
                 ]
               }
@@ -167,7 +167,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' WORKFLOW ',
                     width: 'fit'
                   },
-                  { text: ` ${this.workflow.name || ''}`, width: 'fit' },
+                  { text: ` ${this.workflow.name || ''}`, height: 1 },
                   { style: 'bold', text: ' Stopped ', width: 'fit' },
                   { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -192,7 +192,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' ROUTINE  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { text: ` ${event.payload.name}`, height: 1 },
                   { style: 'bold', text: ' Running ', width: 'fit' },
                   { text: this.formatTime(event.payload.startedAt), width: 'fit' }
                 ]
@@ -214,7 +214,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' ROUTINE  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { text: ` ${event.payload.name}`, height: 1 },
                   { style: 'bold', text: ' Success ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -238,7 +238,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' ROUTINE  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { text: ` ${event.payload.name}`, height: 1 },
                   { style: 'bold', text: ' Failure ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
@@ -262,13 +262,12 @@ export default class WorkflowTerminalPresenter {
                     text: ' ROUTINE  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { text: ` ${event.payload.name}`, height: 1 },
                   { style: 'bold', text: ' Error ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' }
                 ]
               },
-
               {
                 blocks: [
                   { text: '  ', width: 'fit' },
@@ -295,7 +294,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' ROUTINE  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { text: ` ${event.payload.name}`, height: 1 },
                   { style: 'bold', text: ' Stopping ', width: 'fit' }
                 ]
               }
@@ -316,7 +315,7 @@ export default class WorkflowTerminalPresenter {
                     text: ' ROUTINE  ',
                     width: 'fit'
                   },
-                  { text: ` ${event.payload.name}`, width: 'fit' },
+                  { text: ` ${event.payload.name}`, height: 1 },
                   { style: 'bold', text: ' Stopped ', width: 'fit' },
                   { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
                   { text: ' ', width: 'fit' },
