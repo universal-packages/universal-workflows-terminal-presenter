@@ -1,9 +1,8 @@
-import { TerminalPresenter } from '@universal-packages/terminal-presenter'
+import { Logger } from '@universal-packages/logger'
 import { RoutineGraph, StrategyGraph, Workflow } from '@universal-packages/workflows'
 
 export interface WorkflowTerminalPresenterOptions {
-  logEvents?: boolean
-  logSize?: 'essentials' | 'full'
+  logger?: Logger
   showRoutines?: 'always' | 'pending' | 'running'
   showRoutineSteps?: 'always' | 'routine-active' | 'pending' | 'running'
   showStrategyRoutines?: 'always' | 'strategy-active' | 'pending' | 'running'

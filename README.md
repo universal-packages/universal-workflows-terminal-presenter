@@ -33,20 +33,8 @@ await workflow.run()
 
 ##### Options
 
-export interface WorkflowTerminalPresenterOptions {
-logEvents?: boolean
-showRoutines?: 'always' | 'pending' | 'running'
-showRoutineSteps?: 'always' | 'routine-active' | 'pending' | 'running'
-showStrategyRoutines?: 'always' | 'strategy-active' | 'pending' | 'running'
-terminalPresenter?: TerminalPresenter
-workflow: Workflow
-}
-
-- **`logEvents`** `boolean` `default: true`
-  Print workflow events as logs above the graph.
-
-- **`logSize`** `essentials | full` `default: essentials`
-  The size of the logs, `essentials` will only log important events like failures, `full` will log all events.
+- **`logger`** `Logger`
+  A logger instance to use to visualize workflow events.
 
 - **`showRoutines`** `'always' | 'pending' | 'running'` `default: 'always'`
   Show routines in the graph, `always` will always show them, `pending` will show them when they are not done, `running` will show them when they are running.

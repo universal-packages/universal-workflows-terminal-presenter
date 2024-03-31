@@ -1,10 +1,29 @@
-import { BlockDescriptor, BlueColor, BrownColor, Color, GrayColor, GreenColor, OrangeColor, RedColor, WhiteColor } from '@universal-packages/terminal-document'
-import { DocumentDescriptor, TerminalDocument } from '@universal-packages/terminal-document'
+import { Logger } from '@universal-packages/logger'
+import {
+  BlockDescriptor,
+  BlueColor,
+  BrownColor,
+  Color,
+  GrayColor,
+  GreenColor,
+  OrangeColor,
+  PinkColor,
+  PurpleColor,
+  RedColor,
+  WhiteColor
+} from '@universal-packages/terminal-document'
 import { BlockController, LoadingBlock, PresenterDocumentDescriptor, PresenterRowDescriptor, TerminalPresenter, TimeWatch } from '@universal-packages/terminal-presenter'
 import { RoutineGraph, Status, StrategyGraph, Workflow, WorkflowGraph } from '@universal-packages/workflows'
 
+import { LOG_CONFIGURATION } from './LOG_CONFIGURATION'
 import { RoutineBlockMapItem, WorkflowTerminalPresenterOptions } from './types'
 
+const ENVIRONMENT_COLORS: Record<string, { primary: Color; secondary: Color }> = {
+  development: { primary: OrangeColor.OrangeRed, secondary: WhiteColor.White },
+  production: { primary: PurpleColor.DarkMagenta, secondary: WhiteColor.White },
+  test: { primary: PinkColor.MediumVioletRed, secondary: WhiteColor.White },
+  other: { primary: PurpleColor.Purple, secondary: WhiteColor.White }
+}
 export default class WorkflowTerminalPresenter {
   public readonly options: WorkflowTerminalPresenterOptions
 
@@ -12,11 +31,10 @@ export default class WorkflowTerminalPresenter {
   private hooked = false
 
   private stepsLastOutputs: Record<string, Record<string, string>> = {}
+  private logger: Logger
 
   public constructor(options: WorkflowTerminalPresenterOptions) {
     this.options = {
-      logEvents: true,
-      logSize: 'essentials',
       showRoutines: 'always',
       showRoutineSteps: 'running',
       showStrategyRoutines: 'strategy-active',
@@ -24,464 +42,224 @@ export default class WorkflowTerminalPresenter {
     }
 
     this.workflow = this.options.workflow
+    this.logger = this.options.logger
   }
 
   public present() {
     if (this.hooked) return
     this.hooked = true
 
-    if (this.options.logEvents) {
-      this.workflow.on('running', () => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: BlueColor.SteelBlue,
-                    color: WhiteColor.AliceBlue,
-                    style: 'bold',
-                    text: ' WORKFLOW ',
-                    width: 'fit'
-                  },
-                  { text: ` ${this.workflow.name || ''}`, height: 1 },
-                  { style: 'bold', text: ' Running ', width: 'fit' },
-                  { text: this.formatTime(this.workflow.startedAt), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+    if (this.options.logger) {
+      this.workflow.on('running', (event) => {
+        this.logger.log(
+          {
+            level: 'QUERY',
+            title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} started`,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('success', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: GreenColor.Green,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' WORKFLOW ',
-                    width: 'fit'
-                  },
-                  { text: ` ${this.workflow.name || ''}`, height: 1 },
-                  { style: 'bold', text: ' Success ', width: 'fit' },
-                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'INFO',
+            title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} succeeded`,
+            measurement: event.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('failure', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' WORKFLOW ',
-                    width: 'fit'
-                  },
-                  { text: ` ${this.workflow.name || ''}`, height: 1 },
-                  { style: 'bold', text: ' Failure ', width: 'fit' },
-                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} failed`,
+            measurement: event.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('error', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' WORKFLOW ',
-                    width: 'fit'
-                  },
-                  { text: ` ${this.workflow.name || ''}`, height: 1 },
-                  { style: 'bold', text: ' Error ', width: 'fit' },
-                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' }
-                ]
-              },
-              {
-                blocks: [
-                  { text: '  ', width: 'fit' },
-                  {
-                    color: RedColor.DarkRed,
-                    text: event.error.toString()
-                  }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} errored`,
+            error: event.error,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
-      this.workflow.on('stopping', () => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkSalmon,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' WORKFLOW ',
-                    width: 'fit'
-                  },
-                  { text: ` ${this.workflow.name || ''}`, height: 1 },
-                  { style: 'bold', text: ' Stopping ', width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+      this.workflow.on('stopping', (event) => {
+        this.logger.log(
+          {
+            level: 'QUERY',
+            title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} stopping`,
+            metadata: this.eventPayloadWithoutGraphKeys(event)
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('stopped', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' WORKFLOW ',
-                    width: 'fit'
-                  },
-                  { text: ` ${this.workflow.name || ''}`, height: 1 },
-                  { style: 'bold', text: ' Stopped ', width: 'fit' },
-                  { text: this.formatTime(this.workflow.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} stopped`,
+            measurement: event.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
 
       this.workflow.on('routine:running', (event) => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: BrownColor.DarkGoldenrod,
-                    color: WhiteColor.AliceBlue,
-                    style: 'bold',
-                    text: ' ROUTINE  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.name}`, height: 1 },
-                  { style: 'bold', text: ' Running ', width: 'fit' },
-                  { text: this.formatTime(event.payload.startedAt), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'QUERY',
+            title: `Routine ${event.payload.name} started`,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('routine:success', (event) => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: GreenColor.Green,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' ROUTINE  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.name}`, height: 1 },
-                  { style: 'bold', text: ' Success ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'INFO',
+            title: `Routine ${event.payload.name} succeeded`,
+            measurement: event.payload.graph.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('routine:failure', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' ROUTINE  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.name}`, height: 1 },
-                  { style: 'bold', text: ' Failure ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Routine ${event.payload.name} failed`,
+            measurement: event.payload.graph.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('routine:error', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' ROUTINE  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.name}`, height: 1 },
-                  { style: 'bold', text: ' Error ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' }
-                ]
-              },
-              {
-                blocks: [
-                  { text: '  ', width: 'fit' },
-                  {
-                    color: RedColor.DarkRed,
-                    text: event.error.toString()
-                  }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Routine ${event.payload.name} errored`,
+            error: event.error,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('routine:stopping', (event) => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkSalmon,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' ROUTINE  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.name}`, height: 1 },
-                  { style: 'bold', text: ' Stopping ', width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'QUERY',
+            title: `Routine ${event.payload.name} stopping`,
+            metadata: this.eventPayloadWithoutGraphKeys(event)
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('routine:stopped', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' ROUTINE  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.name}`, height: 1 },
-                  { style: 'bold', text: ' Stopped ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Routine ${event.payload.name} stopped`,
+            measurement: event.payload.graph.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
 
       this.workflow.on('step:running', (event) => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: BrownColor.DarkGoldenrod,
-                    color: WhiteColor.AliceBlue,
-                    style: 'bold',
-                    text: ' STEP  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
-                  { style: 'bold', text: ' Running ', width: 'fit' },
-                  { text: this.formatTime(event.payload.startedAt), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'QUERY',
+            title: `Step ${event.payload.graph.command || event.payload.graph.usable} started`,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('step:success', (event) => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: GreenColor.Green,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' STEP  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
-                  { style: 'bold', text: ' Success ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'INFO',
+            title: `Step ${event.payload.graph.command || event.payload.graph.usable} succeeded`,
+            measurement: event.payload.graph.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('step:failure', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' STEP  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
-                  { style: 'bold', text: ' Failure ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
-                ]
-              },
-              {
-                blocks: [
-                  { text: '  ', width: 'fit' },
-                  {
-                    color: RedColor.DarkRed,
-                    text: event.payload.graph.output
-                  }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Step ${event.payload.graph.command || event.payload.graph.usable} failed`,
+            measurement: event.payload.graph.measurement,
+            message: event.payload.graph.output,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('step:error', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' STEP  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
-                  { style: 'bold', text: ' Error ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' }
-                ]
-              },
-              {
-                blocks: [
-                  { text: '  ', width: 'fit' },
-                  {
-                    color: RedColor.DarkRed,
-                    text: event.error.toString()
-                  }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Step ${event.payload.graph.command || event.payload.graph.usable} errored`,
+            error: event.error,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('step:stopping', (event) => {
-        if (['full'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkSalmon,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' STEP  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
-                  { style: 'bold', text: ' Stopping ', width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'QUERY',
+            title: `Step ${event.payload.graph.command || event.payload.graph.usable} stopping`,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
       this.workflow.on('step:stopped', (event) => {
-        if (['full', 'essentials'].includes(this.options.logSize)) {
-          TerminalPresenter.printDocument({
-            rows: [
-              {
-                blocks: [
-                  {
-                    backgroundColor: RedColor.DarkRed,
-                    color: WhiteColor.White,
-                    style: 'bold',
-                    text: ' STEP  ',
-                    width: 'fit'
-                  },
-                  { text: ` ${event.payload.graph.command || event.payload.graph.usable} ${event.payload.routine}-${event.payload.index}`, height: 1 },
-                  { style: 'bold', text: ' Stopped ', width: 'fit' },
-                  { text: this.formatTime(event.payload.graph.endedAt), width: 'fit' },
-                  { text: ' ', width: 'fit' },
-                  { text: event.payload.graph.measurement.toString(), width: 'fit' }
-                ]
-              }
-            ]
-          })
-        }
+        this.logger.log(
+          {
+            level: 'ERROR',
+            title: `Step ${event.payload.graph.command || event.payload.graph.usable} stopped`,
+            measurement: event.payload.graph.measurement,
+            metadata: this.eventPayloadWithoutGraphKeys(event),
+            category: 'WORKFLOWS'
+          },
+          LOG_CONFIGURATION
+        )
       })
     }
 
@@ -507,32 +285,53 @@ export default class WorkflowTerminalPresenter {
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {
+    const ENVIRONMENT_COLOR = ENVIRONMENT_COLORS[process.env.NODE_ENV] || ENVIRONMENT_COLORS.other
+    const primaryColor = LOG_CONFIGURATION.categoryBackgroundColor as Color
+
     const rowDescriptors: PresenterRowDescriptor[] = []
 
     const workflowHeadBlocks: (BlockController | BlockDescriptor)[] = []
     const workflowHeadRow: PresenterRowDescriptor = {
-      border: [true, false, true, false],
-      borderStyle: 'dash-2',
-      borderColor: BlueColor.SteelBlue,
+      border: [true, false, false, false],
+      borderStyle: 'double',
+      borderColor: primaryColor,
       blocks: workflowHeadBlocks
     }
 
-    workflowHeadBlocks.push({ backgroundColor: BlueColor.SteelBlue, color: WhiteColor.AliceBlue, style: 'bold', text: ' WORKFLOW ', width: 'fit' })
+    workflowHeadBlocks.push(LoadingBlock())
+    workflowHeadBlocks.push({ text: ' ', width: 'fit' })
+    workflowHeadBlocks.push({
+      color: primaryColor,
+      style: 'bold',
+      text: this.workflow.name || 'Workflow',
+      width: 'fit'
+    })
+
+    workflowHeadBlocks.push({ text: ' ' })
+
+    workflowHeadBlocks.push({ backgroundColor: primaryColor, style: 'bold', text: ' WORKFLOWS ', width: 'fit' })
     workflowHeadBlocks.push({ text: ' ', width: 'fit' })
 
-    if ([Status.Running, Status.Stopping].includes(this.workflow.status)) {
-      workflowHeadBlocks.push(LoadingBlock())
+    if (process.env.NODE_ENV) {
+      workflowHeadBlocks.push({
+        backgroundColor: ENVIRONMENT_COLOR.primary,
+        color: ENVIRONMENT_COLOR.secondary,
+        style: 'bold',
+        text: ` ${process.env.NODE_ENV.toUpperCase()} `,
+        verticalAlign: 'middle',
+        width: 'fit'
+      })
+      workflowHeadBlocks.push({ text: ' ', width: 'fit' })
     }
-
-    workflowHeadBlocks.push({ style: 'italic', text: ` ${this.workflow.name} `, width: 'fit' })
 
     if (this.workflow.startedAt) {
       workflowHeadBlocks.push(TimeWatch({ initialTime: this.workflow.startedAt?.getTime(), targetTime: this.workflow.endedAt?.getTime() }))
     }
 
-    workflowHeadBlocks.push({ text: ' ' })
-
     rowDescriptors.push(workflowHeadRow)
+
+    // MIDDLE ROW ===============================================================
+    rowDescriptors.push({ blocks: [{ text: ' ' }] })
 
     const routineBlockMapItems: RoutineBlockMapItem[][] = []
 
@@ -791,27 +590,6 @@ export default class WorkflowTerminalPresenter {
               }
 
               rowDescriptors.push(currentRow)
-
-              if (
-                [Status.Running, Status.Failure].includes(currentStep.status) &&
-                this.stepsLastOutputs[currentRoutineBlockMapItem.routineGraph.name] &&
-                this.stepsLastOutputs[currentRoutineBlockMapItem.routineGraph.name][k]
-              ) {
-                const lastOutputRowBlocks: (BlockController | BlockDescriptor)[] = []
-
-                if (currentRoutineBlockMapItem.isStrategyElement) {
-                  lastOutputRowBlocks.push({ text: ' '.repeat(indentationSize + 4), width: 'fit' })
-                } else {
-                  lastOutputRowBlocks.push({ text: ' '.repeat(indentationSize + 2), width: 'fit' })
-                }
-
-                lastOutputRowBlocks.push({
-                  color: currentStep.status === Status.Failure ? RedColor.DarkRed : undefined,
-                  height: 1,
-                  text: this.stepsLastOutputs[currentRoutineBlockMapItem.routineGraph.name][k]
-                })
-                rowDescriptors.push({ blocks: lastOutputRowBlocks })
-              }
             }
           }
 
@@ -823,6 +601,15 @@ export default class WorkflowTerminalPresenter {
         }
       }
     }
+
+    // END ROW ===============================================================
+
+    rowDescriptors.push({
+      border: [false, false, true, false],
+      borderStyle: 'double',
+      borderColor: primaryColor,
+      blocks: [{ text: ' ' }]
+    })
 
     return { rows: rowDescriptors }
   }
@@ -839,15 +626,14 @@ export default class WorkflowTerminalPresenter {
     }
   }
 
-  private formatTime(date?: Date): string {
-    const currentDate = date || new Date()
-    const hours = currentDate.getHours()
-    const minutes = currentDate.getMinutes()
-    const seconds = currentDate.getSeconds()
-    const formattedHours = hours < 10 ? `0${hours}` : hours.toString()
-    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes.toString()
-    const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds.toString()
+  private eventPayloadWithoutGraphKeys(event: Record<string, any>): Record<string, any> {
+    if (!event.payload) return
+    const payload = { ...event.payload }
 
-    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
+    delete payload.graph
+
+    if (Object.keys(payload).length === 0) return
+
+    return payload
   }
 }
