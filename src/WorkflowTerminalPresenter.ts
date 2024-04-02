@@ -38,6 +38,7 @@ export default class WorkflowTerminalPresenter {
       showRoutines: 'always',
       showRoutineSteps: 'running',
       showStrategyRoutines: 'strategy-active',
+      TerminalPresenter: TerminalPresenter,
       ...options
     }
 
@@ -271,17 +272,17 @@ export default class WorkflowTerminalPresenter {
         this.stepsLastOutputs[event.payload.routine][event.payload.index] = event.payload.data
       }
 
-      TerminalPresenter.updateDocument('workflow', this.generateWorkflowDocument(graph))
+      this.options.TerminalPresenter.updateDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
     })
 
     this.workflow.on('end', () => {
       setTimeout(() => {
-        TerminalPresenter.removeDocument('workflow')
+        this.options.TerminalPresenter.removeDocument('WORKFLOW-DOC')
         this.workflow.removeAllListeners()
       }, 1000)
     })
 
-    TerminalPresenter.appendDocument('workflow', this.generateWorkflowDocument(this.workflow.graph))
+    this.options.TerminalPresenter.appendDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {

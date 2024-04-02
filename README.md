@@ -45,7 +45,7 @@ await workflow.run()
 - **`showStrategyRoutines`** `'always' | 'strategy-active' | 'pending' | 'running'` `default: 'always'`
   Show strategy routines in the graph, `always` will always show them, `strategy-active` will show them when the strategy is active, `pending` will show them when they are not done, `running` will show them when they are running.
 
-- **`terminalPresenter`** `TerminalPresenter` `default: new TerminalPresenter()`
+- **`TerminalPresenter`** `TerminalPresenter`
   The terminal presenter to use to present the graph.
 
 - **`workflow`** `Workflow`
