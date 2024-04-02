@@ -276,10 +276,8 @@ export default class WorkflowTerminalPresenter {
     })
 
     this.workflow.on('end', () => {
-      setTimeout(() => {
-        this.options.TerminalPresenter.removeDocument('WORKFLOW-DOC')
-        this.workflow.removeAllListeners()
-      }, 1000)
+      this.options.TerminalPresenter.removeDocument('WORKFLOW-DOC')
+      this.workflow.removeAllListeners()
     })
 
     this.options.TerminalPresenter.appendDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
