@@ -1,29 +1,12 @@
 import { Logger } from '@universal-packages/logger'
-import {
-  BlockDescriptor,
-  BlueColor,
-  BrownColor,
-  Color,
-  GrayColor,
-  GreenColor,
-  OrangeColor,
-  PinkColor,
-  PurpleColor,
-  RedColor,
-  WhiteColor
-} from '@universal-packages/terminal-document'
+import { EnvironmentTagBlock } from '@universal-packages/logger-terminal-presenter'
+import { BlockDescriptor, BrownColor, Color, GrayColor, GreenColor, OrangeColor, RedColor, WhiteColor } from '@universal-packages/terminal-document'
 import { BlockController, LoadingBlock, PresenterDocumentDescriptor, PresenterRowDescriptor, TerminalPresenter, TimeWatch } from '@universal-packages/terminal-presenter'
 import { RoutineGraph, Status, StrategyGraph, Workflow, WorkflowGraph } from '@universal-packages/workflows'
 
 import { LOG_CONFIGURATION } from './LOG_CONFIGURATION'
 import { RoutineBlockMapItem, WorkflowTerminalPresenterOptions } from './types'
 
-const ENVIRONMENT_COLORS: Record<string, { primary: Color; secondary: Color }> = {
-  development: { primary: OrangeColor.OrangeRed, secondary: WhiteColor.White },
-  production: { primary: PurpleColor.DarkMagenta, secondary: WhiteColor.White },
-  test: { primary: PinkColor.MediumVioletRed, secondary: WhiteColor.White },
-  other: { primary: PurpleColor.Purple, secondary: WhiteColor.White }
-}
 export default class WorkflowTerminalPresenter {
   public readonly options: WorkflowTerminalPresenterOptions
 
@@ -284,7 +267,6 @@ export default class WorkflowTerminalPresenter {
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {
-    const ENVIRONMENT_COLOR = ENVIRONMENT_COLORS[process.env.NODE_ENV] || ENVIRONMENT_COLORS.other
     const primaryColor = LOG_CONFIGURATION.categoryBackgroundColor as Color
 
     const rowDescriptors: PresenterRowDescriptor[] = []
@@ -312,14 +294,7 @@ export default class WorkflowTerminalPresenter {
     workflowHeadBlocks.push({ text: ' ', width: 'fit' })
 
     if (process.env.NODE_ENV) {
-      workflowHeadBlocks.push({
-        backgroundColor: ENVIRONMENT_COLOR.primary,
-        color: ENVIRONMENT_COLOR.secondary,
-        style: 'bold',
-        text: ` ${process.env.NODE_ENV.toUpperCase()} `,
-        verticalAlign: 'middle',
-        width: 'fit'
-      })
+      workflowHeadBlocks.push(EnvironmentTagBlock())
       workflowHeadBlocks.push({ text: ' ', width: 'fit' })
     }
 
