@@ -1,7 +1,16 @@
 import { Logger } from '@universal-packages/logger'
 import { EnvironmentTagBlock } from '@universal-packages/logger-terminal-presenter'
 import { BlockDescriptor, BrownColor, Color, GrayColor, GreenColor, OrangeColor, RedColor, WhiteColor } from '@universal-packages/terminal-document'
-import { BlockController, LoadingBlock, PresenterDocumentDescriptor, PresenterRowDescriptor, TerminalPresenter, TimeWatchBlock } from '@universal-packages/terminal-presenter'
+import {
+  BlockController,
+  LoadingBlock,
+  PresenterDocumentDescriptor,
+  PresenterRowDescriptor,
+  TimeWatchBlock,
+  appendRealTimeDocument,
+  removeRealTimeDocument,
+  updateRealTimeDocument
+} from '@universal-packages/terminal-presenter'
 import { RoutineGraph, Status, StrategyGraph, Workflow, WorkflowGraph } from '@universal-packages/workflows'
 
 import { LOG_CONFIGURATION } from './LOG_CONFIGURATION'
@@ -254,15 +263,15 @@ export default class WorkflowTerminalPresenter {
         this.stepsLastOutputs[event.payload.routine][event.payload.index] = event.payload.data
       }
 
-      TerminalPresenter.firstInstance.updateRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
+      updateRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
     })
 
     this.workflow.on('end', () => {
-      TerminalPresenter.firstInstance.removeRealTimeDocument('WORKFLOW-DOC')
+      removeRealTimeDocument('WORKFLOW-DOC')
       this.workflow.removeAllListeners()
     })
 
-    TerminalPresenter.firstInstance.appendRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
+    appendRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {

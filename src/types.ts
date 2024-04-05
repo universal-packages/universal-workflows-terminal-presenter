@@ -1,5 +1,4 @@
 import { Logger } from '@universal-packages/logger'
-import { TerminalPresenter } from '@universal-packages/terminal-presenter'
 import { RoutineGraph, StrategyGraph, Workflow } from '@universal-packages/workflows'
 
 export interface WorkflowTerminalPresenterOptions {

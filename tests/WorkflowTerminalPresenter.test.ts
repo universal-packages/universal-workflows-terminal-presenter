@@ -1,22 +1,21 @@
 import { Logger } from '@universal-packages/logger'
-import { TerminalPresenter } from '@universal-packages/terminal-presenter'
+import '@universal-packages/terminal-presenter'
+import { appendRealTimeDocument, printDocument, updateRealTimeDocument } from '@universal-packages/terminal-presenter'
 import { Workflow } from '@universal-packages/workflows'
 
 import { WorkflowTerminalPresenter } from '../src'
 
-jest.mock('@universal-packages/terminal-presenter/TerminalPresenter', () => ({
-  firstInstance: {
-    appendRealTimeDocument: jest.fn(),
-    updateRealTimeDocument: jest.fn(),
-    printDocument: jest.fn()
-  }
+jest.mock('@universal-packages/terminal-presenter/terminal-presenter', () => ({
+  appendRealTimeDocument: jest.fn(),
+  updateRealTimeDocument: jest.fn(),
+  printDocument: jest.fn()
 }))
 
 describe(WorkflowTerminalPresenter, (): void => {
   it('throws if use not implemented', async (): Promise<void> => {
-    const appendMock = TerminalPresenter.firstInstance.appendRealTimeDocument as jest.Mock
-    const updateMock = TerminalPresenter.firstInstance.updateRealTimeDocument as jest.Mock
-    const printMock = TerminalPresenter.firstInstance.printDocument as jest.Mock
+    const appendMock = appendRealTimeDocument as jest.Mock
+    const updateMock = updateRealTimeDocument as jest.Mock
+    const printMock = printDocument as jest.Mock
 
     const logger = new Logger({ transports: ['terminal-presenter'] })
     await logger.prepare()
