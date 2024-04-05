@@ -18,6 +18,12 @@ async function doIt() {
 
   await workflow.run()
 
+  process.on('SIGINT', async () => {
+    await workflow.stop()
+    await terminalPresenter.restore()
+    process.exit(0)
+  })
+
   await terminalPresenter.restore()
 }
 
