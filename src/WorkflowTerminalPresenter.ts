@@ -1,7 +1,7 @@
 import { Logger } from '@universal-packages/logger'
 import { EnvironmentTagBlock } from '@universal-packages/logger-terminal-presenter'
 import { BlockDescriptor, BrownColor, Color, GrayColor, GreenColor, OrangeColor, RedColor, WhiteColor } from '@universal-packages/terminal-document'
-import { BlockController, LoadingBlock, PresenterDocumentDescriptor, PresenterRowDescriptor, TerminalPresenter, TimeWatch } from '@universal-packages/terminal-presenter'
+import { BlockController, LoadingBlock, PresenterDocumentDescriptor, PresenterRowDescriptor, TerminalPresenter, TimeWatchBlock } from '@universal-packages/terminal-presenter'
 import { RoutineGraph, Status, StrategyGraph, Workflow, WorkflowGraph } from '@universal-packages/workflows'
 
 import { LOG_CONFIGURATION } from './LOG_CONFIGURATION'
@@ -21,7 +21,6 @@ export default class WorkflowTerminalPresenter {
       showRoutines: 'always',
       showRoutineSteps: 'running',
       showStrategyRoutines: 'strategy-active',
-      TerminalPresenter: TerminalPresenter,
       ...options
     }
 
@@ -255,15 +254,15 @@ export default class WorkflowTerminalPresenter {
         this.stepsLastOutputs[event.payload.routine][event.payload.index] = event.payload.data
       }
 
-      this.options.TerminalPresenter.updateDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
+      TerminalPresenter.firstInstance.updateRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
     })
 
     this.workflow.on('end', () => {
-      this.options.TerminalPresenter.removeDocument('WORKFLOW-DOC')
+      TerminalPresenter.firstInstance.removeRealTimeDocument('WORKFLOW-DOC')
       this.workflow.removeAllListeners()
     })
 
-    this.options.TerminalPresenter.appendDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
+    TerminalPresenter.firstInstance.appendRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {
@@ -299,7 +298,7 @@ export default class WorkflowTerminalPresenter {
     }
 
     if (this.workflow.startedAt) {
-      workflowHeadBlocks.push(TimeWatch({ initialTime: this.workflow.startedAt?.getTime(), targetTime: this.workflow.endedAt?.getTime() }))
+      workflowHeadBlocks.push(TimeWatchBlock({ initialTime: this.workflow.startedAt?.getTime(), targetTime: this.workflow.endedAt?.getTime() }))
     }
 
     rowDescriptors.push(workflowHeadRow)
@@ -412,7 +411,7 @@ export default class WorkflowTerminalPresenter {
 
           if (currentRoutineBlockMapItem.routineGraph.startedAt) {
             currentRowBlocks.push(
-              TimeWatch({ initialTime: currentRoutineBlockMapItem.routineGraph.startedAt.getTime(), targetTime: currentRoutineBlockMapItem.routineGraph.endedAt?.getTime() })
+              TimeWatchBlock({ initialTime: currentRoutineBlockMapItem.routineGraph.startedAt.getTime(), targetTime: currentRoutineBlockMapItem.routineGraph.endedAt?.getTime() })
             )
           } else {
             currentRowBlocks.push({ text: '--', width: 'fit' })
@@ -469,7 +468,7 @@ export default class WorkflowTerminalPresenter {
                 return lastEndAt
               }, 0) || undefined
 
-            currentRowBlocks.push(TimeWatch({ initialTime: strategyEarliestStartAt, targetTime: strategyRunning ? undefined : strategyLastEndAt }))
+            currentRowBlocks.push(TimeWatchBlock({ initialTime: strategyEarliestStartAt, targetTime: strategyRunning ? undefined : strategyLastEndAt }))
           } else {
             currentRowBlocks.push({ text: '--', width: 'fit' })
           }
@@ -558,7 +557,7 @@ export default class WorkflowTerminalPresenter {
               })
 
               if (currentStep.startedAt) {
-                currentRowBlocks.push(TimeWatch({ initialTime: currentStep.startedAt.getTime(), targetTime: currentStep.endedAt?.getTime() }))
+                currentRowBlocks.push(TimeWatchBlock({ initialTime: currentStep.startedAt.getTime(), targetTime: currentStep.endedAt?.getTime() }))
               } else {
                 currentRowBlocks.push({ text: '--', width: 'fit' })
               }

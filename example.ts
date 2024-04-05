@@ -5,10 +5,11 @@ import { Workflow } from '@universal-packages/workflows'
 import { WorkflowTerminalPresenter } from './src'
 
 async function doIt() {
+  const terminalPresenter = new TerminalPresenter()
+  terminalPresenter.present()
+
   const logger = new Logger({ transports: ['terminal-presenter'] })
   await logger.prepare()
-
-  TerminalPresenter.start()
 
   const workflow = Workflow.buildFrom('sleep-good')
   const workflowTerminalPresenter = new WorkflowTerminalPresenter({ logger, workflow })
@@ -17,7 +18,7 @@ async function doIt() {
 
   await workflow.run()
 
-  await TerminalPresenter.stop()
+  await terminalPresenter.restore()
 }
 
 doIt()
