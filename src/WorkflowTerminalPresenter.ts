@@ -30,6 +30,7 @@ export default class WorkflowTerminalPresenter {
       showRoutines: 'always',
       showRoutineSteps: 'running',
       showStrategyRoutines: 'strategy-active',
+      terminalPresenterAccess: 'local',
       ...options
     }
 
@@ -263,15 +264,28 @@ export default class WorkflowTerminalPresenter {
         this.stepsLastOutputs[event.payload.routine][event.payload.index] = event.payload.data
       }
 
-      updateRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
+      if (this.options.terminalPresenterAccess === 'core') {
+        global['core'].terminalPresenter.updateRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
+      } else {
+        updateRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(graph))
+      }
     })
 
     this.workflow.on('end', () => {
-      removeRealTimeDocument('WORKFLOW-DOC')
+      if (this.options.terminalPresenterAccess === 'core') {
+        global['core'].terminalPresenter.removeRealTimeDocument('WORKFLOW-DOC')
+      } else {
+        removeRealTimeDocument('WORKFLOW-DOC')
+      }
+
       this.workflow.removeAllListeners()
     })
 
-    appendRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
+    if (this.options.terminalPresenterAccess === 'core') {
+      global['core'].terminalPresenter.appendRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
+    } else {
+      appendRealTimeDocument('WORKFLOW-DOC', this.generateWorkflowDocument(this.workflow.graph))
+    }
   }
 
   private generateWorkflowDocument(graph: WorkflowGraph): PresenterDocumentDescriptor {

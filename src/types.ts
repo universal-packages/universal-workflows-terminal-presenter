@@ -6,6 +6,7 @@ export interface WorkflowTerminalPresenterOptions {
   showRoutines?: 'always' | 'pending' | 'running'
   showRoutineSteps?: 'always' | 'routine-active' | 'pending' | 'running'
   showStrategyRoutines?: 'always' | 'strategy-active' | 'pending' | 'running'
+  terminalPresenterAccess?: 'local' | 'core'
   workflow: Workflow
 }
 
