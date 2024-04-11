@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "@universal-packages/logger": "^1.14.1",
-    "@universal-packages/logger-terminal-presenter": "^1.1.5",
-    "@universal-packages/terminal-presenter": "^1.13.1",
+    "@universal-packages/logger-terminal-presenter": "^1.1.6",
+    "@universal-packages/terminal-presenter": "^1.13.2",
     "@universal-packages/workflows": "^1.9.2"
   },
   "devDependencies": {
