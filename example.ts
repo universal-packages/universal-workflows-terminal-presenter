@@ -1,14 +1,13 @@
 import { Logger } from '@universal-packages/logger'
-import { TerminalPresenter } from '@universal-packages/terminal-presenter'
+import { present, restore } from '@universal-packages/terminal-presenter'
 import { Workflow } from '@universal-packages/workflows'
 
 import { WorkflowTerminalPresenter } from './src'
 
 async function doIt() {
-  const terminalPresenter = new TerminalPresenter()
-  terminalPresenter.present()
+  present()
 
-  const logger = new Logger({ transports: ['terminal-presenter'] })
+  const logger = new Logger({ level: 'QUERY', transports: ['terminal-presenter'] })
   await logger.prepare()
 
   const workflow = Workflow.buildFrom('sleep-good')
@@ -20,11 +19,11 @@ async function doIt() {
 
   process.on('SIGINT', async () => {
     await workflow.stop()
-    await terminalPresenter.restore()
+    await restore()
     process.exit(0)
   })
 
-  await terminalPresenter.restore()
+  await restore()
 }
 
 doIt()

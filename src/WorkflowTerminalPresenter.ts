@@ -42,11 +42,11 @@ export default class WorkflowTerminalPresenter {
     if (this.hooked) return
     this.hooked = true
 
-    if (this.options.logger) {
+    if (this.logger) {
       this.workflow.on('running', (event) => {
         this.logger.log(
           {
-            level: 'QUERY',
+            level: 'INFO',
             title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} started`,
             metadata: this.eventPayloadWithoutGraphKeys(event),
             category: 'WORKFLOWS'
@@ -93,7 +93,7 @@ export default class WorkflowTerminalPresenter {
       this.workflow.on('stopping', (event) => {
         this.logger.log(
           {
-            level: 'QUERY',
+            level: 'DEBUG',
             title: `Workflow ${this.workflow.name ? `"${this.workflow.name}"` : ''} stopping`,
             metadata: this.eventPayloadWithoutGraphKeys(event)
           },
@@ -116,7 +116,7 @@ export default class WorkflowTerminalPresenter {
       this.workflow.on('routine:running', (event) => {
         this.logger.log(
           {
-            level: 'QUERY',
+            level: 'DEBUG',
             title: `Routine ${event.payload.name} started`,
             metadata: this.eventPayloadWithoutGraphKeys(event),
             category: 'WORKFLOWS'
@@ -163,7 +163,7 @@ export default class WorkflowTerminalPresenter {
       this.workflow.on('routine:stopping', (event) => {
         this.logger.log(
           {
-            level: 'QUERY',
+            level: 'DEBUG',
             title: `Routine ${event.payload.name} stopping`,
             metadata: this.eventPayloadWithoutGraphKeys(event)
           },
@@ -186,7 +186,7 @@ export default class WorkflowTerminalPresenter {
       this.workflow.on('step:running', (event) => {
         this.logger.log(
           {
-            level: 'QUERY',
+            level: 'DEBUG',
             title: `Step ${event.payload.graph.command || event.payload.graph.usable} started`,
             metadata: this.eventPayloadWithoutGraphKeys(event),
             category: 'WORKFLOWS'
@@ -234,7 +234,7 @@ export default class WorkflowTerminalPresenter {
       this.workflow.on('step:stopping', (event) => {
         this.logger.log(
           {
-            level: 'QUERY',
+            level: 'DEBUG',
             title: `Step ${event.payload.graph.command || event.payload.graph.usable} stopping`,
             metadata: this.eventPayloadWithoutGraphKeys(event),
             category: 'WORKFLOWS'
@@ -625,6 +625,8 @@ export default class WorkflowTerminalPresenter {
   private eventPayloadWithoutGraphKeys(event: Record<string, any>): Record<string, any> {
     if (!event.payload) return
     const payload = { ...event.payload }
+
+    if (payload.graph?.strategy) payload.strategy = payload.graph.strategy
 
     delete payload.graph
 
